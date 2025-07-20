@@ -6,6 +6,7 @@ import SearchSweets from "./pages/SearchSweets";
 import PurchaseSweet from "./pages/PurchaseSweet";
 import RestockSweet from "./pages/RestockSweet";
 import SortSweets from "./pages/SortSweets";
+import DeleteSweetPage from "./pages/DeleteSweetPage";
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
         <Route path="/sort" element={<SortSweets />} />
         <Route path="/purchase" element={<PurchaseSweet />} />
         <Route path="/restock" element={<RestockSweet />} />
+        <Route path="/delete" element={<DeleteSweetPage />} />
       </Routes>
     </Router>
   );

@@ -23,7 +23,9 @@ const ViewSweets = () => {
 
   return (
     <div className="max-w-4xl mx-auto mt-10 px-4">
-      <h2 className="text-3xl font-bold mb-6 text-center text-blue-700">🍭 All Available Sweets</h2>
+      <h2 className="text-3xl font-bold mb-6 text-center text-blue-700">
+        🍭 All Available Sweets
+      </h2>
 
       {loading ? (
         <div className="text-center">Loading...</div>
@@ -33,11 +35,18 @@ const ViewSweets = () => {
         <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-6">
           {sweets.map((sweet) => (
             <div
-              key={sweet.id}
+              key={sweet.id || sweet._id}
               className="bg-white shadow-md p-4 rounded-xl border border-gray-200"
             >
-              <h3 className="text-xl font-semibold text-blue-800">{sweet.name}</h3>
-              <p className="text-sm text-gray-600">Category: {sweet.category}</p>
+              <h3 className="text-xl font-semibold text-blue-800">
+                  {sweet.name.charAt(0).toUpperCase() +
+                    sweet.name.slice(1).toLowerCase()}
+              </h3>
+              <p className="text-sm text-gray-600">
+                Category:{" "}
+                {sweet.category.charAt(0).toUpperCase() +
+                  sweet.category.slice(1).toLowerCase()}
+              </p>
               <p className="text-sm">💰 Price: ₹{sweet.price}</p>
               <p className="text-sm">📦 Stock: {sweet.quantity}</p>
             </div>

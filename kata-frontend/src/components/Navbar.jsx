@@ -4,7 +4,10 @@ import { Link } from "react-router-dom";
 const Navbar = () => {
   return (
     <nav className="bg-blue-600 text-white px-6 py-4 flex justify-between items-center shadow-md">
-      <h1 className="text-xl font-bold">🍭 Sweet Shop</h1>
+      <Link to="/">
+        <h1 className="text-xl font-bold">🍭 Sweet Shop</h1>
+      </Link>
+
       <div className="space-x-4">
         <Link to="/" className="hover:underline">
           Add
@@ -23,6 +26,9 @@ const Navbar = () => {
         </Link>
         <Link to="/restock" className="hover:underline">
           Restock
+        </Link>
+        <Link to="/delete" className="hover:underline">
+          Delete
         </Link>
       </div>
     </nav>
