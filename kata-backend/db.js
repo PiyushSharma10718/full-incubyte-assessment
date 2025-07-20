@@ -1,3 +1,4 @@
+require("dotenv").config();
 // backend/db.js
 const mongoose = require("mongoose");
 
