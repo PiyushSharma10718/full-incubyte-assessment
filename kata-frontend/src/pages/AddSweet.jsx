@@ -56,7 +56,7 @@ const AddSweet = () => {
     };
 
     try {
-      const res = await api.post("/sweets", preparedData);
+      const res = await api.post("/api/sweets", preparedData);
       setMessage("✅ Sweet added successfully!");
       setFormData({ name: "", category: "", price: "", quantity: "" });
       console.log(res.data);
