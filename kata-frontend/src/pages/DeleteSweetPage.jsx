@@ -76,7 +76,7 @@ const DeleteSweetPage = () => {
   // 🔄 Fetch sweets from backend
   const fetchSweets = async () => {
     try {
-      const res = await api.get("/sweets");
+      const res = await api.get("/api/sweets");
       setSweets(res.data);
     } catch (err) {
       console.error("Failed to fetch sweets:", err);
@@ -112,7 +112,7 @@ const DeleteSweetPage = () => {
     if (!confirm) return;
 
     try {
-      await api.delete(`/sweets/${id}`);
+      await api.delete(`/api/sweets/${id}`);
       setSweets((prev) => prev.filter((s) => s._id !== id));
       setMessage("✅ Sweet deleted successfully!");
       setSearchTerm(""); // ✅ Clear the search field

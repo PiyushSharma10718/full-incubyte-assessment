@@ -10,7 +10,7 @@ const SortSweets = () => {
     const fetchSortedSweets = async () => {
       try {
         const queryString = new URLSearchParams({ field, order }).toString();
-        const res = await api.get(`/sweets/sort?${queryString}`);
+        const res = await api.get(`/api/sweets/sort?${queryString}`);
         setSweets(res.data);
       } catch (err) {
         console.error("Error fetching sorted sweets:", err);

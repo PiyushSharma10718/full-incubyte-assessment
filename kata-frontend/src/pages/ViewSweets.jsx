@@ -9,7 +9,7 @@ const ViewSweets = () => {
   useEffect(() => {
     const fetchSweets = async () => {
       try {
-        const res = await api.get("/sweets");
+        const res = await api.get("/api/sweets");
         setSweets(res.data);
         setLoading(false);
       } catch (err) {

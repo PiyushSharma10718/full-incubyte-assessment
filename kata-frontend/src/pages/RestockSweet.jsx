@@ -10,7 +10,7 @@ const RestockSweet = () => {
   useEffect(() => {
     const fetchSweets = async () => {
       try {
-        const res = await api.get("/sweets");
+        const res = await api.get("/api/sweets");
         setSweets(res.data);
       } catch (err) {
         setMessage("❌ Failed to fetch sweets.");
@@ -28,7 +28,7 @@ const RestockSweet = () => {
     }
 
     try {
-      const res = await api.post(`/sweets/restock`, {
+      const res = await api.post(`/api/sweets/restock`, {
         id: selectedId,
         quantity: Number(quantity),
       });

@@ -27,7 +27,7 @@ const SearchSweets = () => {
         }
 
         const queryString = new URLSearchParams(query).toString();
-        const res = await api.get(`/sweets/search?${queryString}`);
+        const res = await api.get(`/api/sweets/search?${queryString}`);
         setResults(res.data);
         setMessage(res.data.length === 0 ? "No matching sweets found." : "");
       } catch (err) {
