@@ -28,9 +28,9 @@ kata-backend/
 ├── routes/
 │   └── sweetRoutes.js    # All endpoints
 ├── tests/
-│   ├── getSweets.test.js
-│   ├── purchaseSweet.test.js
-│   ├── restockSweet.test.js
+│   ├── addSweets.test.js
+│   ├── purchaseSweets.test.js
+│   ├── restockSweets.test.js
 │   ├── sortSweets.test.js
 │   └── searchSweets.test.js
 ├── .env                  # MongoDB URI
@@ -113,8 +113,8 @@ npx jest tests/purchaseSweet.test.js
 
 **Piyush Sharma**  
 _MCA | L.D. College of Engineering_  
-📧 piyush.sharma@example.com  
-🔗 [LinkedIn](https://linkedin.com/in/piyushsharma) | [GitHub](https://github.com/PiyushSharma10718)
+📧 sharmapiyush10718@gmail.com  
+🔗 [LinkedIn](https://www.linkedin.com/in/piyushsharma10718/) | [GitHub](https://github.com/PiyushSharma10718/)
 
 ---
 
