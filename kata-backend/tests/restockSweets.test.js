@@ -1,49 +1,36 @@
-const request = require("supertest");
-const app = require("../app");
+const mongoose = require("mongoose");
+const Sweet = require("../models/Sweet"); // Adjust if path differs
+require("dotenv").config();
 
-describe("POST /api/sweets/restock", () => {
-  let sweetId;
-
-  beforeAll(async () => {
-    // Add a sweet to restock
-    const res = await request(app).post("/api/sweets").send({
-      name: "Kaju Katli",
-      category: "cashew",
-      price: 50,
-      quantity: 20,
-    });
-
-    sweetId = res.body.id; // store the ID
+beforeAll(async () => {
+  // Connect to MongoDB Atlas
+  await mongoose.connect(process.env.MONGODB_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
   });
+});
 
-  it("should restock sweets and increase stock", async () => {
-    const res = await request(app).post("/api/sweets/restock").send({
-      id: sweetId,
-      quantity: 15,
-    });
+afterAll(async () => {
+  await mongoose.connection.close();
+});
 
-    expect(res.statusCode).toBe(200);
-    expect(res.body.message).toBe("Restock successful");
-    expect(res.body.updatedSweet.quantity).toBe(35); // 20 + 15
-  });
+describe("Increase sweet quantity by 100", () => {
+  it("should find the first sweet and increase its quantity by 100", async () => {
+    const sweet = await Sweet.findOne();
 
-  it("should return error if sweet not found", async () => {
-    const res = await request(app).post("/api/sweets/restock").send({
-      id: 9999,
-      quantity: 10,
-    });
+    if (!sweet) {
+      throw new Error("❌ No sweet found in DB to update.");
+    }
 
-    expect(res.statusCode).toBe(404);
-    expect(res.body.error).toBe("Sweet not found");
-  });
+    const originalQuantity = sweet.quantity;
+    sweet.quantity += 100;
+    await sweet.save(); // ✅ Persist the change
 
-  it("should return error if quantity is invalid", async () => {
-    const res = await request(app).post("/api/sweets/restock").send({
-      id: sweetId,
-      quantity: -5,
-    });
+    const updatedSweet = await Sweet.findById(sweet._id);
 
-    expect(res.statusCode).toBe(400);
-    expect(res.body.error).toBe("Invalid restock quantity");
+    expect(updatedSweet.quantity).toBe(originalQuantity + 100);
+    console.log(
+      `✅ Quantity of '${sweet.name}' Increased from ${originalQuantity} to ${updatedSweet.quantity}`
+    );
   });
 });

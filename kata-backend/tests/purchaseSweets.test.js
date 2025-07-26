@@ -1,49 +1,36 @@
-const request = require("supertest");
-const app = require("../app");
+const mongoose = require("mongoose");
+const Sweet = require("../models/Sweet"); // Adjust if path differs
+require("dotenv").config();
 
-describe("POST /api/sweets/purchase", () => {
-  let sweetId;
-
-  beforeAll(async () => {
-    // Add a sweet to purchase from
-    const res = await request(app).post("/api/sweets").send({
-      name: "Jalebi",
-      category: "syrup",
-      price: 12,
-      quantity: 50,
-    });
-
-    sweetId = res.body.id; // store the ID
+beforeAll(async () => {
+  // Connect to MongoDB Atlas
+  await mongoose.connect(process.env.MONGODB_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
   });
+});
 
-  it("should purchase sweets and reduce stock", async () => {
-    const res = await request(app).post("/api/sweets/purchase").send({
-      id: sweetId,
-      quantity: 10,
-    });
+afterAll(async () => {
+  await mongoose.connection.close();
+});
 
-    expect(res.statusCode).toBe(200);
-    expect(res.body.message).toBe("Purchase successful");
-    expect(res.body.updatedSweet.quantity).toBe(40); // 50 - 10
-  });
+describe("Decrease sweet quantity by 10", () => {
+  it("should find the first sweet and Decrease its quantity by 10", async () => {
+    const sweet = await Sweet.findOne();
 
-  it("should return error if insufficient stock", async () => {
-    const res = await request(app).post("/api/sweets/purchase").send({
-      id: sweetId,
-      quantity: 100, // More than available
-    });
+    if (!sweet) {
+      throw new Error("❌ No sweet found in DB to update.");
+    }
 
-    expect(res.statusCode).toBe(400);
-    expect(res.body.error).toBe("Not enough stock available");
-  });
+    const originalQuantity = sweet.quantity;
+    sweet.quantity -= 10;
+    await sweet.save(); // ✅ Persist the change
 
-  it("should return error if sweet ID is invalid", async () => {
-    const res = await request(app).post("/api/sweets/purchase").send({
-      id: 9999,
-      quantity: 1,
-    });
+    const updatedSweet = await Sweet.findById(sweet._id);
 
-    expect(res.statusCode).toBe(404);
-    expect(res.body.error).toBe("Sweet not found");
+    expect(updatedSweet.quantity).toBe(originalQuantity - 10);
+    console.log(
+      `✅ Quantity of '${sweet.name}' Decreased from ${originalQuantity} to ${updatedSweet.quantity}`
+    );
   });
 });

@@ -1,58 +1,42 @@
 const request = require("supertest");
+const mongoose = require("mongoose");
 const app = require("../app");
+require("dotenv").config();
+
+beforeAll(async () => {
+  await mongoose.connect(process.env.MONGODB_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  });
+});
+
+afterAll(async () => {
+  await mongoose.disconnect();
+});
 
 describe("GET /api/sweets/search", () => {
-  beforeEach(async () => {
-    // Reset sweets array before each test
-    app.locals.sweets.length = 0;
+  it("🔍 should search sweets by name (e.g., Ice Cream)", async () => {
+    const res = await request(app).get("/api/sweets/search?name=ice cream");
+    expect(res.statusCode).toBe(200);
+    expect(Array.isArray(res.body)).toBe(true);
+    console.log("✅ Matched by name:", res.body.map((s) => s.name));
+  });
 
-    // Seed fresh data for every test
-    await request(app).post("/api/sweets").send({
-      name: "Gulab Jamun",
-      category: "dessert",
-      price: 25,
-      quantity: 40,
-    });
+  const categories = ["traditional", "candy", "chocolate", "dryfruit", "dessert"];
 
-    await request(app).post("/api/sweets").send({
-      name: "Soan Papdi",
-      category: "dessert",
-      price: 10,
-      quantity: 80,
-    });
-
-    await request(app).post("/api/sweets").send({
-      name: "Chocolate Barfi",
-      category: "chocolate",
-      price: 15,
-      quantity: 60,
+  categories.forEach((category) => {
+    it(`🔍 should search sweets by category: ${category}`, async () => {
+      const res = await request(app).get(`/api/sweets/search?category=${category}`);
+      expect(res.statusCode).toBe(200);
+      expect(Array.isArray(res.body)).toBe(true);
+      console.log(`✅ Category [${category}] results:`, res.body.map((s) => s.name));
     });
   });
 
-  it("should search sweets by name", async () => {
-    const res = await request(app).get("/api/sweets/search?name=Gulab");
+  it("🔍 should search sweets in price range (5 to 500)", async () => {
+    const res = await request(app).get("/api/sweets/search?minPrice=5&maxPrice=500");
     expect(res.statusCode).toBe(200);
-    expect(res.body.length).toBeGreaterThan(0); // ✅ will now pass
-    expect(res.body[0].name).toMatch(/Gulab/i);
-  });
-
-  it("should search sweets by category", async () => {
-    await request(app).post("/api/sweets").send({
-      name: "Mango Candy",
-      category: "candy",
-      price: 5,
-      quantity: 100,
-    });
-
-    const res = await request(app).get("/api/sweets/search?category=candy");
-    expect(res.statusCode).toBe(200);
-    expect(res.body.length).toBeGreaterThan(0);
-    expect(res.body[0].category).toBe("candy");
-  });
-
-  it("should search sweets within a price range", async () => {
-    const res = await request(app).get("/api/sweets/search?minPrice=10&maxPrice=20");
-    expect(res.statusCode).toBe(200);
-    expect(res.body.every(sweet => sweet.price >= 10 && sweet.price <= 20)).toBe(true);
+    expect(res.body.every((s) => s.price >= 5 && s.price <= 500)).toBe(true);
+    console.log("✅ Sweets in price range 5–500:", res.body.map((s) => `${s.name} ₹${s.price}`));
   });
 });

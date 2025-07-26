@@ -1,39 +1,47 @@
 const request = require("supertest");
+const mongoose = require("mongoose");
 const app = require("../app");
+require("dotenv").config();
+
+beforeAll(async () => {
+  // Connect to MongoDB
+  await mongoose.connect(process.env.MONGODB_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  });
+});
+
+afterAll(async () => {
+  await mongoose.disconnect();
+});
 
 describe("GET /api/sweets/sort", () => {
-  beforeAll(async () => {
-    await request(app).post("/api/sweets").send({
-      name: "Peda",
-      category: "milk",
-      price: 30,
-      quantity: 20,
+  const fields = ["name", "category", "price", "quantity"];
+  const orders = ["asc", "desc"];
+
+  fields.forEach((field) => {
+    orders.forEach((order) => {
+      it(`should sort sweets by ${field} in ${order} order`, async () => {
+        const res = await request(app).get(`/api/sweets/sort?field=${field}&order=${order}`);
+        expect(res.statusCode).toBe(200);
+        expect(Array.isArray(res.body)).toBe(true);
+        expect(res.body.length).toBeGreaterThan(1);
+
+        // Extract the field values to test sorting
+        const values = res.body.map((item) => item[field]);
+
+        // Copy and sort the values to compare
+        const sorted = [...values].sort((a, b) => {
+          if (typeof a === "string") {
+            return order === "asc" ? a.localeCompare(b) : b.localeCompare(a);
+          } else {
+            return order === "asc" ? a - b : b - a;
+          }
+        });
+
+        expect(values).toEqual(sorted);
+        console.log(`✅ ${field.toUpperCase()} sorted in ${order.toUpperCase()} order:`, values);
+      });
     });
-
-    await request(app).post("/api/sweets").send({
-      name: "Halwa",
-      category: "wheat",
-      price: 20,
-      quantity: 25,
-    });
-
-    await request(app).post("/api/sweets").send({
-      name: "Barfi",
-      category: "milk",
-      price: 40,
-      quantity: 30,
-    });
-  });
-
-  it("should sort sweets by price ascending", async () => {
-    const res = await request(app).get("/api/sweets/sort?field=price&order=asc");
-    expect(res.statusCode).toBe(200);
-    expect(res.body[0].price).toBeLessThanOrEqual(res.body[1].price);
-  });
-
-  it("should sort sweets by name descending", async () => {
-    const res = await request(app).get("/api/sweets/sort?field=name&order=desc");
-    expect(res.statusCode).toBe(200);
-    expect(res.body[0].name >= res.body[1].name).toBe(true);
   });
 });
